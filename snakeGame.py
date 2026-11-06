@@ -18,40 +18,29 @@ GREEN = (46, 204, 113)
 RED = (231, 76, 60)      
 WHITE = (255, 255, 255) 
 BLUE = (55, 118, 171)
-GRAY = (127, 140, 141)  # Color para los obstáculos
 
 fuente = pygame.font.SysFont(None, 40)
 fuente_chica = pygame.font.SysFont(None, 30)
 reloj = pygame.time.Clock()
 
-def generar_posicion_valida(serpiente, obstaculos):
-    """Genera una posición aleatoria que no quede encima de la serpiente ni de los obstáculos"""
+def generar_manzana(serpiente):
+    """Genera una posición aleatoria para la manzana que no quede encima de la serpiente"""
     while True:
         pos = [
             random.randrange(0, ANCHO // BLOQUE) * BLOQUE,
             random.randrange(0, ALTO // BLOQUE) * BLOQUE
         ]
-        if pos not in serpiente and pos not in obstaculos:
+        if pos not in serpiente:
             return pos
 
 def reiniciar_juego():
-    global serpiente, direccion, manzana, obstaculos, puntuacion, juego_terminado
+    global serpiente, direccion, manzana, juego_terminado
     # La serpiente empieza con 3 bloques de tamaño guardados como coordenadas (x, y)
     serpiente = [[100, 100], [80, 100], [60, 100]]
     direccion = "RIGHT"  # Empieza moviéndose hacia la derecha
-    puntuacion = 0
     
-    # Generamos algunos obstáculos estáticos que estorben en el mapa agregamos 5 objetos
-    obstaculos = []
-    for _ in range(5):
-        obs = [
-            random.randrange(2, (ANCHO // BLOQUE) - 2) * BLOQUE,
-            random.randrange(2, (ALTO // BLOQUE) - 2) * BLOQUE
-        ]
-        obstaculos.append(obs)
-
-    # Generamos la primera manzana evitando que caiga en la serpiente u obstáculos
-    manzana = generar_posicion_valida(serpiente, obstaculos)
+    # Generamos la primera manzana evitando que caiga en la serpiente
+    manzana = generar_manzana(serpiente)
     juego_terminado = False
 
 # Llamamos a la función para iniciar por primera vez
@@ -59,7 +48,7 @@ reiniciar_juego()
 
 # Bucle principal del juego
 while True:
-    # Se maneja el evento aqui que es cuando el usuario elija S o N para continuar o salir
+    # Se maneja el evento para salir o reiniciar
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
             pygame.quit()
@@ -99,9 +88,8 @@ while True:
 
         # Si la serpiente toca (come) la manzana
         if cabeza == manzana:
-            puntuacion += 1  # Sumamos 1 al marcador de manzanas
-            # Generamos una nueva manzana en coordenadas aleatorias válidas llamando la funcion para que no reaparezca donde esta la serpiente o los bloques
-            manzana = generar_posicion_valida(serpiente, obstaculos)
+            # Generamos una nueva manzana en coordenadas aleatorias válidas
+            manzana = generar_manzana(serpiente)
             # Como agarró la manzana, no se borra la cola (la serpiente crece)
         else:
             # Si no comió, eliminamos el último bloque para mantener el tamaño
@@ -119,17 +107,8 @@ while True:
             if cabeza == bloque:
                 juego_terminado = True
 
-        # 3. Choque con los obstáculos
-        for obs in obstaculos:
-            if cabeza == obs:
-                juego_terminado = True
-
     # Renderizado en pantalla
     pantalla.fill(GREEN)
-
-    # Dibujar los obstáculos
-    for obs in obstaculos:
-        pygame.draw.rect(pantalla, GRAY, (obs[0], obs[1], BLOQUE, BLOQUE))
 
     # Dibujar la manzana
     pygame.draw.rect(pantalla, RED, (manzana[0], manzana[1], BLOQUE, BLOQUE))
@@ -138,22 +117,15 @@ while True:
     for bloque in serpiente:
         pygame.draw.rect(pantalla, BLUE, (bloque[0], bloque[1], BLOQUE, BLOQUE))
 
-    # Mostrar la puntuación actual en la esquina superior izquierda durante la partida
-    texto_puntuacion = fuente_chica.render(f"Manzanas: {puntuacion}", True, WHITE)
-    pantalla.blit(texto_puntuacion, (15, 15))
-
-    # Si perdió, mostrar mensaje de Game Over y cuántas manzanas llevabas
+    # Si perdió, mostrar mensaje de Game Over simple
     if juego_terminado:
-        #Donde se muestra los textos en la pantalla
-        texto_perdid = fuente.render("¡Haz Perdido!", True, BLACK)
-        texto_resultado = fuente_chica.render(f"Manzanas totales recolectadas: {puntuacion}", True, BLACK)
+        texto_perdid = fuente.render("¡Has Perdido!", True, BLACK)
         texto_opciones = fuente_chica.render("(S = Jugar de nuevo / N = Salir)", True, BLACK)
         
-        pantalla.blit(texto_perdid, (ANCHO // 2 - 70, ALTO // 2 - 50))
-        pantalla.blit(texto_resultado, (ANCHO // 2 - 150, ALTO // 2 - 10))
-        pantalla.blit(texto_opciones, (ANCHO // 2 - 130, ALTO // 2 + 30))
+        pantalla.blit(texto_perdid, (ANCHO // 2 - 90, ALTO // 2 - 30))
+        pantalla.blit(texto_opciones, (ANCHO // 2 - 130, ALTO // 2 + 10))
 
     pygame.display.flip()  # Mostramos en pantalla lo que se editó
     
-    # Velocidad del juego ajustada a 10 FPS para que se mueva de forma fluida y jugable lo tenia en 15 pero se siente rapido y origalmente va mas lento.
+    # Velocidad del juego ajustada a 10 FPS
     reloj.tick(10)
