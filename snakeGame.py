@@ -144,7 +144,7 @@ while True:
 
     # Si perdió, mostrar mensaje de Game Over y cuántas manzanas llevabas
     if juego_terminado:
-        #Donde se muestra los textos en la pantalla
+        #Donde se muestra los textos en la pantalla del usuario
         texto_perdid = fuente.render("¡Haz Perdido!", True, BLACK)
         texto_resultado = fuente_chica.render(f"Manzanas totales recolectadas: {puntuacion}", True, BLACK)
         texto_opciones = fuente_chica.render("(S = Jugar de nuevo / N = Salir)", True, BLACK)
