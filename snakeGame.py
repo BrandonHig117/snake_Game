@@ -24,6 +24,12 @@ fuente = pygame.font.SysFont(None, 40)
 fuente_chica = pygame.font.SysFont(None, 30)
 reloj = pygame.time.Clock()
 
+pygame.mixer.music.load("..\Media\sonidoBrandon.mp3")
+pygame.mixer.music.play()
+
+imagen = pygame.image.load("..\Media\snakeFoto.jpg")
+fondo = pygame.transform.scale(imagen, (ANCHO, ALTO))
+
 def generar_posicion_valida(serpiente, obstaculos):
     """Genera una posición aleatoria que no quede encima de la serpiente ni de los obstáculos"""
     while True:
@@ -125,7 +131,9 @@ while True:
                 juego_terminado = True
 
     # Renderizado en pantalla
-    pantalla.fill(GREEN)
+    #pantalla.fill(GREEN)
+
+    pantalla.blit(fondo, (0, 0)) 
 
     # Dibujar los obstáculos
     for obs in obstaculos:
